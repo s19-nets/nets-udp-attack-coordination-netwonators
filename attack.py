@@ -46,15 +46,15 @@ e_set = set([server_socket, client_socket])
 
 timeout = 5
 
-state = "idle" 
 
+state = "idle" 
+count = 0
 while True: 
     time.sleep(random.randrange(2,5))
 
     readready, writeready, error = select(r_set, w_set, e_set, timeout)
 
     if not readready:
-        count = 0
         if state == "idle": 
             msg = "marco"
             server_socket.sendto(msg.encode(), server_addr)
@@ -90,8 +90,7 @@ while True:
             elif state == "wait-2" and message.decode().find("Confirm") == 0: 
                 state = "end"
             else: 
-                print("error")
-                sys.exit(1)
+                print("I has ended")
 
     if state == "end":
         print("Attack time will be at %s" % tomorrow_attack)
