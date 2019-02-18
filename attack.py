@@ -3,6 +3,7 @@
 import sys, re
 import time, os
 import random 
+import datetime
 from select import select
 from socket import *
 
@@ -11,6 +12,7 @@ pid = os.getpid()
 server_addr = ("", 50010)
 listen_addr = ("", 50000)
 
+tomorrow_attack = datetime.datetime.now() + datetime.timedelta(days=1) 
 
 def usage(): 
     print("Usage: %s -l <host:port> -s <host:port>" % sys.argv[1])
@@ -58,17 +60,25 @@ while True:
             server_socket.sendto(msg.encode(), server_addr)
             sent_time = time.time()
             state = "wait" 
-            print("i sent %s" % msg)
+            print("%s: i sent %s" % (pid,msg))
         elif state == "wait" and time.time() - sent_time >= 5: 
             msg = "marco"
             server_socket.sendto(msg.encode(), server_addr)
             count += 1
-            print("Message %s was sent %d times" % (msg, count))
+            print("%s: Message %s was sent %d times" % (pid, msg, count))
         else: 
             print("Something went wrong bye")
             sys.exit(1)
     else:
         for sock in readready: 
             message, port = client_socket.recvfrom(2048)
-            print("I have recived %s from %s" % (message, repr(port)))
-
+            print("%s: I have recived %s from %s" % (pid, message, repr(port)))
+            if message.decode() == "marco": 
+                state = "wait-attk"
+                retmsg = "polo"
+                server_socket.sendto(retmsg.encode(), server_addr)
+                print("%s: I acknowledge message %s and sent %s" % (pid,message, retmsg))
+            elif message.decode() == "polo" and state == "wait":
+                attk_msg = "attack %s" % tomorrow_attack
+                server_socket.sendto(attk_msg.encode(), server_addr)
+                print("%s: I sent attack time"%pid)
