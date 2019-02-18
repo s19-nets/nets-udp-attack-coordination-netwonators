@@ -2,12 +2,14 @@
 
 import sys, re
 import time, os
-
+import random 
+from select import select
 from socket import *
+
 pid = os.getpid()
 
+server_addr = ("", 50010)
 listen_addr = ("", 50000)
-send_addr = ("", 50010)
 
 
 def usage(): 
@@ -21,20 +23,19 @@ try:
         sw = args[0]; del args[0]
         if sw == "-l": 
             addr, port = re.split(":",args[0]); del args[0]
-            listen_addr = (addr, port)
+            listen_addr = (addr, int(port))
         elif sw == "-s": 
             addr, port = re.split(":", args[0]); del args[0]
-            send_addr = (addr, port)
+            server_addr = (addr, int(port))
         else: 
             print("Unexpected argument!")
             usage()
+except: 
+    usage()
 
-#time.sleep(1)                        # sleep for 1 second
-send_socket = scoket(AF_INET, SOCK_DGRAM) # send messages socket (Client socket)
+server_socket = socket(AF_INET, SOCK_DGRAM)
 
-listen_socket = socket(AF_INET, SOCK_DGRAM) # listening for incoming messages socket (Server socket)
-listen_socket.bind(listen_addr) #bind
-""" CSMA/CD implementation: 
-     
-"""
+client_socket = socket(AF_INET, SOCK_DGRAM)
+client_socket.bind(listen_addr)
+
 
