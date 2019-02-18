@@ -14,7 +14,7 @@ echo "Proxies started (pids=$PR_PIDS)"
 # start attack programs
 ./attack.py -l localhost:50000 -s localhost:50011 &
 A_PIDS=$!
-./attack.py -s localhost:50001 -s localhost:50010 &
+./attack.py -l localhost:50001 -s localhost:50010 &
 A_PIDS="$A_PIDS $!"
 
 echo "$0: waiting for attacks (pids=$A_PIDS) to compute attack time"

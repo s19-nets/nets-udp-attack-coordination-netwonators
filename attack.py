@@ -38,4 +38,37 @@ server_socket = socket(AF_INET, SOCK_DGRAM)
 client_socket = socket(AF_INET, SOCK_DGRAM)
 client_socket.bind(listen_addr)
 
+r_set = set([server_socket, client_socket])
+w_set = set()
+e_set = set([server_socket, client_socket])
+
+timeout = 5
+
+state = "idle" 
+
+while True: 
+    time.sleep(random.randrange(2,5))
+
+    readready, writeready, error = select(r_set, w_set, e_set, timeout)
+
+    if not readready:
+        count = 0
+        if state == "idle": 
+            msg = "marco"
+            server_socket.sendto(msg.encode(), server_addr)
+            sent_time = time.time()
+            state = "wait" 
+            print("i sent %s" % msg)
+        elif state == "wait" and time.time() - sent_time >= 5: 
+            msg = "marco"
+            server_socket.sendto(msg.encode(), server_addr)
+            count += 1
+            print("Message %s was sent %d times" % (msg, count))
+        else: 
+            print("Something went wrong bye")
+            sys.exit(1)
+    else:
+        for sock in readready: 
+            message, port = client_socket.recvfrom(2048)
+            print("I have recived %s from %s" % (message, repr(port)))
 
