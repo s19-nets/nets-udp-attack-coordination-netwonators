@@ -81,4 +81,18 @@ while True:
             elif message.decode() == "polo" and state == "wait":
                 attk_msg = "attack %s" % tomorrow_attack
                 server_socket.sendto(attk_msg.encode(), server_addr)
+                state = "wait-2"
                 print("%s: I sent attack time"%pid)
+            elif state == "wait-attk" and message.decode().find("attack") == 0: 
+                ok_msg = "Confirm attack time %s" % message.decode()[7:]
+                server_socket.sendto(ok_msg.encode(), server_addr)
+                state = "end"
+            elif state == "wait-2" and message.decode().find("Confirm") == 0: 
+                state = "end"
+            else: 
+                print("error")
+                sys.exit(1)
+
+    if state == "end":
+        print("Attack time will be at %s" % tomorrow_attack)
+        sys.exit(0)
